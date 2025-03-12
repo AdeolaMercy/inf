@@ -1,0 +1,15 @@
+# Debian-based managed hosts
+[deb_based]
+# ubuntu ansible_host=185.150.117.222
+# debian ansible_host=185.150.119.120
+azure ansible_host=20.120.96.115
+
+# Redhat-based managed hosts
+[rhel_based]
+# centos ansible_host=185.150.119.119
+
+# Global variables
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_user=azureadmin
+ansible_ssh_private_key_file=/home/kali/learn-terraform/id_rsa
