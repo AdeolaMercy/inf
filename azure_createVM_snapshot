@@ -1,0 +1,42 @@
+subscriptionId="735e78fb-7b7e-4df0-ac8a-a723d04f2e54"
+
+#Provide the name of your resource group
+#resourceGroupName=rg-proper-poodle
+#newresourceGroupName=rg-snapshots
+
+# Create a new resource group for new VM.
+az group create --name rg-test-snapshot --location eastus
+newresourcegroup=rg-test-snapshot
+
+#current resource group
+resourceGroupName=rg-proper-poodle
+
+#Provide the name of the snapshot that will be used to create Managed Disks
+snapshotName=osDisk-backup
+
+#Provide the name of the Managed Disk
+osDiskName=myOSDiskName
+
+#Provide the size of the disks in GB. It should be greater than the VHD file size.
+diskSize=128
+
+#Provide the storage type for Managed Disk. Premium_LRS or Standard_LRS.
+storageType=Premium_LRS
+
+#Provide the OS type
+osType=linux
+
+#Provide the name of the virtual machine
+virtualMachineName=TestMachine
+
+#Set the context to the subscription Id where Managed Disk will be created
+az account set --subscription $subscriptionId
+
+#Get the snapshot Id from current resource group
+snapshotId=$(az snapshot show --name $snapshotName --resource-group $resourceGroupName --query [id] -o tsv)
+
+#Create a new Managed Disks using the snapshot Id
+az disk create --resource-group $newresourcegroup --name $osDiskName --sku $storageType --size-gb $diskSize --source $snapshotId
+
+#Create VM by attaching created managed disks as OS
+az vm create --name $virtualMachineName --resource-group $newresourcegroup --attach-os-disk $osDiskName --os-type $osType
