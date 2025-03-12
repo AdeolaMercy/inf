@@ -1,6 +1,8 @@
-#Provide the subscription Id of the subscription where you want to create Managed Disks
-#subscriptionId="7b7e-7654-658a-7654rfg"
+#get subscription id through query
 subscriptionId=$(az account show --query id -o tsv)  
+
+#update source IP address-prefix
+ipaddress=provide your ip address
 
 #Provide the name of your resource group
 #resourceGroupName=rg-proper-poodle
@@ -43,6 +45,10 @@ az disk create --resource-group $newresourcegroup --name $osDiskName --sku $stor
 #Create VM by attaching created managed disks as OS
 az vm create --name $virtualMachineName --resource-group $newresourcegroup --attach-os-disk $osDiskName --os-type $osType
 
+#get public ip address of machine
+publicip=$(az vm show -d --resource-group $newresourcegroup -n $virtualMachineName --query "publicIps" -o tsv)
+privateip=$(az vm show -d --resource-group $newresourcegroup -n $newresourcegroup --query "privateIps" -o tsv)
+
 #List network security groups created
 #nsg_list=az network nsg list --resource-group $newresourcegroup
 #list_nsg= $(az network nsg list --resource-group $newresourcegroup --query "[].name" -o tsv)
@@ -53,4 +59,4 @@ nsg_name=$(az network nsg list --resource-group $newresourcegroup --query "[].na
 nsg_rules=$(az network nsg rule list --resource-group $newresourcegroup --nsg-name $nsg_name --query "[].name" -o tsv)
 
 #Update rule
-az network nsg rule update --name $nsg_rules --nsg-name $nsg_name --resource-group $newresourcegroup --access Allow --protocol Tcp --direction Inbound --priority 100 --source-address-prefix 10.0.1.0/24 --source-port-range "*" --destination-address-prefix "*" --destination-port-range "22"
+az network nsg rule update --name $nsg_rules --nsg-name $nsg_name --resource-group $newresourcegroup --access Allow --protocol Tcp --direction Inbound --priority 100 --source-address-prefix $ipaddress --source-port-range "*" --destination-address-prefix $publicip,$privateip --destination-port-range "22"
