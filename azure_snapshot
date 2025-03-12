@@ -1,0 +1,3 @@
+osDiskId=$(az vm show -g rg-name -n VMName --query "storageProfile.osDisk.managedDisk.id" -o tsv)
+
+az snapshot create -g rg-name --source "$osDiskId" --name osDisk-backup
