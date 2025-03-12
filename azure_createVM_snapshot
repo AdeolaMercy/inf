@@ -1,3 +1,4 @@
+#Provide the subscription Id of the subscription where you want to create Managed Disks
 subscriptionId="735e78fb-7b7e-4df0-ac8a-a723d04f2e54"
 
 #Provide the name of your resource group
@@ -40,3 +41,15 @@ az disk create --resource-group $newresourcegroup --name $osDiskName --sku $stor
 
 #Create VM by attaching created managed disks as OS
 az vm create --name $virtualMachineName --resource-group $newresourcegroup --attach-os-disk $osDiskName --os-type $osType
+
+#List network security groups created
+#nsg_list=az network nsg list --resource-group $newresourcegroup
+#list_nsg= $(az network nsg list --resource-group $newresourcegroup --query "[].name" -o tsv)
+nsg_name=$(az network nsg list --resource-group $newresourcegroup --query "[].name" -o tsv)  
+
+#List rules in a network security group
+#nsg_rules=az network nsg rule list --nsg-name --resource-group $newresourcegroup
+nsg_rules=$(az network nsg rule list --resource-group $newresourcegroup --nsg-name $nsg_name --query "[].name" -o tsv)
+
+#Update rule
+az network nsg rule update --name $nsg_rules --nsg-name $nsg_name --resource-group $newresourcegroup --access Allow --protocol Tcp --direction Inbound --priority 100 --source-address-prefix 10.0.1.0/24 --source-port-range "*" --destination-address-prefix "*" --destination-port-range "22"
