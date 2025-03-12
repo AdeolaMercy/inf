@@ -1,0 +1,80 @@
+---
+- name: install Apache
+  hosts: azure
+  become: true
+  vars:
+    http_port: 80
+    domain: 20.120.96.115
+  tasks:
+    - name: install Apache webserver on Ubuntu
+      apt:
+        name: apache2
+        state: latest
+
+    - name: install git
+      apt:
+        name: git
+        state: latest
+
+    - name: enable mod_rewrite
+      apache2_module:
+        name: rewrite
+        state: present
+      notify:
+        - restart apache2
+
+    - name: apache2 listen on {{http_port}}
+      lineinfile:
+        dest: /etc/apache2/ports.conf
+        regexp: "^Listen "
+        line: "Listen {{http_port}}"
+      notify:
+        - restart apache2
+
+    - name: apache2 virtualhost on {{http_port}}
+      lineinfile:
+        dest: /etc/apache2/sites-available/000-default.conf
+        regexp: "^<VirtualHost \\*:"
+        line: "<VirtualHost *:{{http_port}}>"
+      notify:
+        - restart apache2
+
+    - name: create virtual host file
+      template: src=virtualhost.conf dest=/etc/apache2/sites-available/{{ domain }}.conf
+
+    - name: create html file
+      template: src=index.html dest=/var/www/{{domain}}/index.html
+
+    - name: create aboutus file
+      template: src=about.html dest=/var/www/{{domain}}/about.html
+
+    - name: create .htaccess file
+      template: src=.htaccess dest=/var/www/{{domain}}/.htaccess
+
+    - name: a2ensite {{ domain }}
+      command: a2ensite {{ domain }}
+      args:
+        creates: /etc/apache2/sites-enabled/{{ domain }}.conf
+      notify:
+        - restart apache2
+
+    #- name: clone basic html template
+    #  git: repo=https://github.com/do-community/ansible-apache-tutorial.git dest=/var/www/20.120.96.115 update=no
+
+
+  handlers:
+    - name: restart apache2
+      service:
+        name: apache2
+        state: restarted
+
+- name: Install and configure nginx for static website hosting
+  hosts: azure
+  become: yes
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
