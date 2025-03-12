@@ -1,5 +1,6 @@
 #Provide the subscription Id of the subscription where you want to create Managed Disks
-subscriptionId="735e78fb-7b7e-4df0-ac8a-a723d04f2e54"
+#subscriptionId="7b7e-7654-658a-7654rfg"
+subscriptionId=$(az account show --query id -o tsv)  
 
 #Provide the name of your resource group
 #resourceGroupName=rg-proper-poodle
