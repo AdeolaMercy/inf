@@ -4,7 +4,7 @@
   become: true
   vars:
     http_port: 80
-    domain: 20.120.96.115
+    domain: domain_name
   tasks:
     - name: install Apache webserver on Ubuntu
       apt:
@@ -59,7 +59,7 @@
         - restart apache2
 
     #- name: clone basic html template
-    #  git: repo=https://github.com/do-community/ansible-apache-tutorial.git dest=/var/www/20.120.96.115 update=no
+    #  git: repo=https://github.com/do-community/ansible-apache-tutorial.git dest=/var/www/domain_name update=no
 
 
   handlers:
