@@ -1,12 +1,12 @@
 # Debian-based managed hosts
 [deb_based]
-# ubuntu ansible_host=185.150.117.222
-# debian ansible_host=185.150.119.120
-azure ansible_host=20.120.96.115
+# ubuntu ansible_host=ip_Address
+# debian ansible_host=ip_address
+azure ansible_host=ip_Address
 
 # Redhat-based managed hosts
 [rhel_based]
-# centos ansible_host=185.150.119.119
+# centos ansible_host=ip_address
 
 # Global variables
 [all:vars]
